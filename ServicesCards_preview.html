@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Services – CrossTecch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #07091a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      overflow-x: hidden;
+    }
+
+    /* Subtle dot grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .section {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+    }
+
+    /* ── Header ── */
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #4a6aaa;
+      margin-bottom: 12px;
+    }
+    .headline {
+      font-size: clamp(28px, 4vw, 50px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1.5px;
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+    .headline span { color: transparent; background: linear-gradient(90deg,#4f8ef7,#a855f7); -webkit-background-clip:text; background-clip:text; }
+    .subline {
+      font-size: 14px;
+      color: #3d4f72;
+      margin-bottom: 60px;
+      font-weight: 400;
+    }
+
+    /* ══════════════════════════════════
+       CARD DECK
+    ══════════════════════════════════ */
+    .cards {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: stretch;
+      height: 440px;
+    }
+
+    /* Base card */
+    .card {
+      position: relative;
+      width: 185px;
+      border-radius: 24px;
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition:
+        width 0.7s cubic-bezier(0.4, 0, 0.15, 1),
+        box-shadow 0.5s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── When deck is active: shrink all, grow hovered ── */
+    .cards.deck-active .card {
+      width: 72px;
+    }
+    .cards.deck-active .card.card-open {
+      width: 420px;
+    }
+
+    /* ══ Card background layers ══ */
+    .card-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      transition: opacity 0.5s ease;
+    }
+    /* Default: subtle dark tinted bg */
+    .card-bg-default {
+      opacity: 1;
+    }
+    /* Active: vivid gradient bg */
+    .card-bg-active {
+      opacity: 0;
+    }
+    .card-open .card-bg-default { opacity: 0; }
+    .card-open .card-bg-active  { opacity: 1; }
+
+    /* Sheen / gloss overlay */
+    .card-sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 2;
+    }
+    .card-open .card-sheen { opacity: 1; }
+
+    /* Border glow */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 25px;
+      padding: 1px;
+      background: var(--glow);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .card-open::before { opacity: 1; }
+
+    /* ══ COLLAPSED STATE — vertical layout ══ */
+    .card-collapsed {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 0;
+      z-index: 4;
+      transition: opacity 0.3s ease;
+    }
+    .card-open .card-collapsed { opacity: 0; pointer-events: none; }
+
+    .card-collapsed-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .card:not(.card-open):hover .card-collapsed-icon {
+      transform: scale(1.1);
+    }
+    .card-collapsed-icon svg { width: 22px; height: 22px; }
+
+    .card-collapsed-label {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+    }
+
+    /* ══ EXPANDED STATE — full layout ══ */
+    .card-expanded {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 36px 32px;
+      gap: 18px;
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease 0.15s;
+      min-width: 380px; /* prevent text wrap during transition */
+    }
+    .card-open .card-expanded {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .card-expanded-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.12);
+      padding: 5px 12px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    .card-expanded-icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+    }
+    .card-expanded-icon svg { width: 30px; height: 30px; }
+
+    .card-expanded-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    .card-expanded-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.75;
+      flex: 1;
+    }
+
+    .card-expanded-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 40px;
+      width: fit-content;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+    .card-expanded-cta:hover { background: rgba(255,255,255,0.28); transform: translateX(3px); }
+    .card-expanded-cta svg { width: 16px; height: 16px; }
+
+    /* ══ CARD THEMES ══ */
+    /* 1 – Blue */
+    .card-1 { --glow: linear-gradient(135deg,#4f8ef7,#1d4ed8); }
+    .card-1 .card-bg-default { background: linear-gradient(160deg,#0f1e3d 0%,#091428 100%); }
+    .card-1 .card-bg-active  { background: linear-gradient(145deg,#1e40af 0%,#1d4ed8 50%,#3b82f6 100%); }
+    .card-1:hover:not(.card-open) { box-shadow: 0 10px 40px rgba(79,142,247,0.25); }
+    .card-1.card-open { box-shadow: 0 30px 80px rgba(79,142,247,0.45); }
+
+    /* 2 – Violet */
+    .card-2 { --glow: linear-gradient(135deg,#a855f7,#7c3aed); }
+    .card-2 .card-bg-default { background: linear-gradient(160deg,#1a0f3d 0%,#100928 100%); }
+    .card-2 .card-bg-active  { background: linear-gradient(145deg,#6d28d9 0%,#7c3aed 50%,#a855f7 100%); }
+    .card-2:hover:not(.card-open) { box-shadow: 0 10px 40px rgba(168,85,247,0.25); }
+    .card-2.card-open { box-shadow: 0 30px 80px rgba(168,85,247,0.45); }
+
+    /* 3 – Amber */
+    .card-3 { --glow: linear-gradient(135deg,#f59e0b,#ea580c); }
+    .card-3 .card-bg-default { background: linear-gradient(160deg,#1f1200 0%,#140c00 100%); }
+    .card-3 .card-bg-active  { background: linear-gradient(145deg,#b45309 0%,#d97706 50%,#f59e0b 100%); }
+    .card-3:hover:not(.card-open) { box-shadow: 0 10px 40px rgba(245,158,11,0.25); }
+    .card-3.card-open { box-shadow: 0 30px 80px rgba(245,158,11,0.45); }
+
+    /* 4 – Emerald */
+    .card-4 { --glow: linear-gradient(135deg,#10b981,#059669); }
+    .card-4 .card-bg-default { background: linear-gradient(160deg,#001f14 0%,#001209 100%); }
+    .card-4 .card-bg-active  { background: linear-gradient(145deg,#065f46 0%,#059669 50%,#10b981 100%); }
+    .card-4:hover:not(.card-open) { box-shadow: 0 10px 40px rgba(16,185,129,0.25); }
+    .card-4.card-open { box-shadow: 0 30px 80px rgba(16,185,129,0.45); }
+
+    /* 5 – Cyan */
+    .card-5 { --glow: linear-gradient(135deg,#22d3ee,#0891b2); }
+    .card-5 .card-bg-default { background: linear-gradient(160deg,#001a22 0%,#00111a 100%); }
+    .card-5 .card-bg-active  { background: linear-gradient(145deg,#0e7490 0%,#0891b2 50%,#22d3ee 100%); }
+    .card-5:hover:not(.card-open) { box-shadow: 0 10px 40px rgba(34,211,238,0.25); }
+    .card-5.card-open { box-shadow: 0 30px 80px rgba(34,211,238,0.45); }
+
+    /* Collapsed icon tints */
+    .card-1 .card-collapsed-icon svg { stroke: #4f8ef7; }
+    .card-2 .card-collapsed-icon svg { stroke: #a855f7; }
+    .card-3 .card-collapsed-icon svg { stroke: #f59e0b; }
+    .card-4 .card-collapsed-icon svg { stroke: #10b981; }
+    .card-5 .card-collapsed-icon svg { stroke: #22d3ee; }
+
+    /* Expanded icon tints */
+    .card-1 .card-expanded-icon svg { stroke: #fff; }
+    .card-2 .card-expanded-icon svg { stroke: #fff; }
+    .card-3 .card-expanded-icon svg { stroke: #fff; }
+    .card-4 .card-expanded-icon svg { stroke: #fff; }
+    .card-5 .card-expanded-icon svg { stroke: #fff; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .cards { flex-direction: column; height: auto; align-items: center; }
+      .card  { width: 100% !important; max-width: 400px; height: 72px; }
+      .card-open { height: 420px !important; }
+      .cards.deck-active .card { width: 100% !important; max-width: 400px; }
+      .card-collapsed { flex-direction: row; }
+      .card-collapsed-label { writing-mode: horizontal-tb; transform: none; }
+      .card-expanded { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="section">
+  <p class="eyebrow">What We Offer</p>
+  <h2 class="headline">Our <span>Services</span></h2>
+  <p class="subline">Hover any card — watch the magic</p>
+
+  <div class="cards" id="deck">
+
+    <!-- ── Card 1: Manual QA ── -->
+    <div class="card card-1" data-index="0">
+      <div class="card-bg card-bg-default"></div>
+      <div class="card-bg card-bg-active"></div>
+      <div class="card-sheen"></div>
+
+      <!-- Collapsed -->
+      <div class="card-collapsed">
+        <div class="card-collapsed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <span class="card-collapsed-label">Manual QA</span>
+      </div>
+
+      <!-- Expanded -->
+      <div class="card-expanded">
+        <span class="card-expanded-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+          Testing
+        </span>
+        <div class="card-expanded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="card-expanded-title">Manual QA<br>Testing</h3>
+        <p class="card-expanded-desc">Human-driven test cycles that catch edge cases no automation can predict. We validate every single user flow, interaction, and edge case before release.</p>
+        <div class="card-expanded-cta">
+          Explore Service
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 2: Automation Testing ── -->
+    <div class="card card-2" data-index="1">
+      <div class="card-bg card-bg-default"></div>
+      <div class="card-bg card-bg-active"></div>
+      <div class="card-sheen"></div>
+
+      <div class="card-collapsed">
+        <div class="card-collapsed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/>
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M12 7v4"/>
+            <circle cx="8" cy="16" r="1.2" fill="currentColor"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="card-collapsed-label">Automation</span>
+      </div>
+
+      <div class="card-expanded">
+        <span class="card-expanded-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+          Automation
+        </span>
+        <div class="card-expanded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/>
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M12 7v4"/>
+            <circle cx="8" cy="16" r="1.2" fill="white"/>
+            <circle cx="16" cy="16" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        <h3 class="card-expanded-title">Automation<br>Testing</h3>
+        <p class="card-expanded-desc">Scalable test suites powered by Selenium, Playwright & Cypress. Ship at speed with zero regressions and full CI/CD integration built in from day one.</p>
+        <div class="card-expanded-cta">
+          Explore Service
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 3: DevOps ── -->
+    <div class="card card-3" data-index="2">
+      <div class="card-bg card-bg-default"></div>
+      <div class="card-bg card-bg-active"></div>
+      <div class="card-sheen"></div>
+
+      <div class="card-collapsed">
+        <div class="card-collapsed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 12c-2-2.5-4-4-6-4a4 4 0 0 0 0 8c2 0 4-1.5 6-4z"/>
+            <path d="M12 12c2 2.5 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.5-6 4z"/>
+          </svg>
+        </div>
+        <span class="card-collapsed-label">DevOps</span>
+      </div>
+
+      <div class="card-expanded">
+        <span class="card-expanded-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          DevOps
+        </span>
+        <div class="card-expanded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 12c-2-2.5-4-4-6-4a4 4 0 0 0 0 8c2 0 4-1.5 6-4z"/>
+            <path d="M12 12c2 2.5 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.5-6 4z"/>
+          </svg>
+        </div>
+        <h3 class="card-expanded-title">DevOps<br>Pipeline</h3>
+        <p class="card-expanded-desc">CI/CD automation, container orchestration with Docker & Kubernetes, and infrastructure-as-code. Accelerate your release velocity and maximise uptime.</p>
+        <div class="card-expanded-cta">
+          Explore Service
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 4: Content Engine ── -->
+    <div class="card card-4" data-index="3">
+      <div class="card-bg card-bg-default"></div>
+      <div class="card-bg card-bg-active"></div>
+      <div class="card-sheen"></div>
+
+      <div class="card-collapsed">
+        <div class="card-collapsed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <span class="card-collapsed-label">Content</span>
+      </div>
+
+      <div class="card-expanded">
+        <span class="card-expanded-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Content
+        </span>
+        <div class="card-expanded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <h3 class="card-expanded-title">Content<br>Engine</h3>
+        <p class="card-expanded-desc">AI-powered content pipelines producing SEO-ready, brand-consistent copy at scale. From blogs to campaigns — every channel, every audience, every time.</p>
+        <div class="card-expanded-cta">
+          Explore Service
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Card 5: Cloud Services ── -->
+    <div class="card card-5" data-index="4">
+      <div class="card-bg card-bg-default"></div>
+      <div class="card-bg card-bg-active"></div>
+      <div class="card-sheen"></div>
+
+      <div class="card-collapsed">
+        <div class="card-collapsed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+        </div>
+        <span class="card-collapsed-label">Cloud</span>
+      </div>
+
+      <div class="card-expanded">
+        <span class="card-expanded-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          Cloud
+        </span>
+        <div class="card-expanded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+        </div>
+        <h3 class="card-expanded-title">Cloud<br>Services</h3>
+        <p class="card-expanded-desc">AWS, GCP & Azure architecture, seamless migration, and ongoing cost optimisation. Built for reliability, scalability, and security at every level of scale.</p>
+        <div class="card-expanded-cta">
+          Explore Service
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+</div><!-- /section -->
+
+<script>
+  const deck  = document.getElementById('deck');
+  const cards = Array.from(deck.querySelectorAll('.card'));
+
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      deck.classList.add('deck-active');
+      cards.forEach(c => c.classList.remove('card-open'));
+      card.classList.add('card-open');
+    });
+  });
+
+  deck.addEventListener('mouseleave', () => {
+    deck.classList.remove('deck-active');
+    cards.forEach(c => c.classList.remove('card-open'));
+  });
+</script>
+</body>
+</html>
